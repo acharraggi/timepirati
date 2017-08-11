@@ -1,6 +1,7 @@
 /*
     ./webpack.config.js
 */
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
@@ -8,6 +9,7 @@ const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
   filename: 'index.html',
   inject: 'body'
 });
+
 module.exports = {
   entry: './client/index.js',
   output: {
@@ -22,18 +24,10 @@ module.exports = {
 
 	{
 	  test: /\.css$/,
-	  loader: 'style-loader'
-	},
-	{
-	  test: /\.css$/,
-	  loader: 'css-loader',
-	  query: {
-	    modules: true,
-	    localIdentName: '[name]__[local]___[hash:base64:5]'
-	  }
+	  loader: ExtractTextPlugin.extract('css-loader?modules=true&localIdentName=[name]__[local]___[hash:base64:5]')
 	}
-
     ]
   },
-  plugins: [HtmlWebpackPluginConfig]
+  plugins: [new ExtractTextPlugin('styles.css'),
+      HtmlWebpackPluginConfig]
 };
