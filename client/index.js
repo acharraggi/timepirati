@@ -5,5 +5,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App.jsx';
+import {TimerStore} from './TimerStore';
+import {useStrict} from 'mobx';
+useStrict(true);
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const timerStore = new TimerStore();
+
+ReactDOM.render(
+    <App timerStore={timerStore}/>,
+    document.getElementById('root'));

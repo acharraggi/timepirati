@@ -3,11 +3,14 @@
 */
 import React from 'react';
 import styles from './app.css';
+import Timer from './Timer.jsx';
+//import {observer} from 'mobx-react';
 
 export default class App extends React.Component {
-  constructor() {
-    super();
-    this.state = { count: 0 };
+  constructor(props) {
+    super(props);
+    this.state = { count: 0};
+   // this.timerStore = props.timerStore;
   }
 
   increment() {
@@ -21,7 +24,12 @@ export default class App extends React.Component {
           <p>Hello world!  Some green text.</p>
           <button onClick={() => this.increment()}>Increment</button>
           <p>Count = { this.state.count }.</p>
+          <hr/>
+          <Timer testText="hello there"
+                 timerStore={this.props.timerStore} />
         </div>
     );
   }
 }
+//<Timer timerStore={this.timerStore} />
+//{testText: "hello there", timerStore: {this.props.timerStore}}
