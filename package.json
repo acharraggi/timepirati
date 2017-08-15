@@ -6,7 +6,7 @@
   "author": "Mike Silversides <mike.silversides@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server --history-api-fallback"
   },
   "dependencies": {
     "format-number-with-string": "0.0.2",
@@ -17,6 +17,7 @@
     "path": "^0.12.7",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
+    "react-router-dom": "^4.1.2",
     "uuid": "latest",
     "webpack": "^3.4.1",
     "webpack-dev-server": "^2.6.1"

@@ -3,33 +3,33 @@
 */
 import React from 'react';
 import styles from './app.css';
+import Home from './Home.jsx';
 import Timer from './Timer.jsx';
-//import {observer} from 'mobx-react';
+import About from './About.jsx';
+import {
+  NavLink,
+  Route
+} from 'react-router-dom';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { count: 0};
-   // this.timerStore = props.timerStore;
-  }
-
-  increment() {
-    this.setState({
-      count: this.state.count + 1
-    });
   }
   render() {
     return (
-        <div className={styles.app}>
-          <p>Hello world!  Some green text.</p>
-          <button onClick={() => this.increment()}>Increment</button>
-          <p>Count = { this.state.count }.</p>
-          <hr/>
-          <Timer testText="hello there"
-                 timerStore={this.props.timerStore} />
+        <div>
+          <h1>TimePirati</h1>
+          <ul className={styles.ul_header}>
+            <li className={styles.ul_li}><NavLink to="/" exact activeClassName={styles.selected}>Home</NavLink></li>
+            <li className={styles.ul_li}><NavLink to="/timer" exact activeClassName={styles.selected}>Timer</NavLink></li>
+            <li className={styles.ul_li}><NavLink to="/about" exact activeClassName={styles.selected}>About</NavLink></li>
+          </ul>
+          <div className={styles.content}>
+            <Route exact path="/" component={Home}/>
+            <Route path="/timer" render={routeProps => <Timer {...routeProps} timerStore={this.props.timerStore}/>}/>
+            <Route path="/about" component={About}/>
+          </div>
         </div>
     );
   }
 }
-//<Timer timerStore={this.timerStore} />
-//{testText: "hello there", timerStore: {this.props.timerStore}}

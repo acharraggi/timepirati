@@ -5,17 +5,8 @@ import {observer} from "mobx-react";
 export default @observer class Timer extends React.Component {
   constructor(props) {
     super(props);
-    //this.state.timerStore = props.timerStore;
-    this.state = {
-      text: props.testText
-    }
   }
 
-  // increment() {
-  //   this.setState({
-  //     count: this.state.count + 1
-  //   });
-  // }
   render() {
     let firstButton;
     let secondButton;
@@ -48,17 +39,10 @@ export default @observer class Timer extends React.Component {
           </button>
       );
       secondButton = null;
-      // (
-      //     <button
-      //         onClick={() => this.props.timerStore.lapTimer()}
-      //     >
-      //       lap
-      //     </button>
-      // );
     }
     return (
         <div className={styles.timer}>
-          <p>Some blue timer text. msg = {this.state.text}</p>
+          <p>Some blue timer text.</p>
           <p>{this.props.timerStore.mainDisplay}</p>
             {firstButton}
             {secondButton}
