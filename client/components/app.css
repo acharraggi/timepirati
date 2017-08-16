@@ -6,6 +6,11 @@ body {
 h1, h2, p, ul, li {
   font-family: Helvetica, Arial, sans-serif;
 }
+.selected {
+    color:white;
+    pointer-events: none;
+    text-decoration: underline !important;
+}
 .ul_header {
   background-color: #111;
   padding: 0;
@@ -17,6 +22,12 @@ h1, h2, p, ul, li {
   padding: 20px;
   display: inline-block;
 }
+
+.ul_li a:link, .ul_li a:visited  {
+    color: white;
+    text-decoration: none;
+}
+
 .content {
   background-color: #FFF;
   padding: 20px;
@@ -28,7 +39,4 @@ h1, h2, p, ul, li {
 .content li {
   margin-bottom: 10px;
 }
-.selected {
-  color:white;
-  background-color: blue;
-}
+
