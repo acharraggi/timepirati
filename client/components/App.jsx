@@ -26,8 +26,8 @@ export default class App extends React.Component {
           </ul>
           <div className={styles.content}>
             <Route exact path="/" component={Home}/>
-            <Route path="/timer" render={routeProps => <Timer {...routeProps} timerStore={this.props.timerStore}/>}/>
-            <Route path="/about" component={About}/>
+            <Route path="/timer" render={routeProps => <Timer {...routeProps} rootStore={this.props.rootStore}/>}/>
+            <Route path="/about" render={routeProps => <About {...routeProps} rootStore={this.props.rootStore}/>}/>
           </div>
         </div>
     );

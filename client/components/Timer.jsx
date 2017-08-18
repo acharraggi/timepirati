@@ -5,15 +5,16 @@ import {observer} from "mobx-react";
 export default @observer class Timer extends React.Component {
   constructor(props) {
     super(props);
+    this.timerStore = props.rootStore.timerStore;
   }
 
   render() {
     let firstButton;
     let secondButton;
-    if (!this.props.timerStore.isRunning) {
+    if (!this.timerStore.isRunning) {
       firstButton = (
           <button
-              onClick={() => this.props.timerStore.startTimer()}
+              onClick={() => this.timerStore.startTimer()}
           >
             start
           </button>
@@ -21,19 +22,19 @@ export default @observer class Timer extends React.Component {
 
       secondButton = (
           <button
-              onClick={() => this.props.timerStore.resetTimer()}
+              onClick={() => this.timerStore.resetTimer()}
           >
             reset
           </button>
       );
 
-      if (!this.props.timerStore.hasStarted) {
+      if (!this.timerStore.hasStarted) {
         secondButton = null;
       }
     } else {
       firstButton = (
           <button
-              onClick={() => this.props.timerStore.stopTimer()}
+              onClick={() => this.timerStore.stopTimer()}
           >
             stop
           </button>
@@ -43,7 +44,7 @@ export default @observer class Timer extends React.Component {
     return (
         <div className={styles.timer}>
           <p>Some blue timer text.</p>
-          <p>{this.props.timerStore.mainDisplay}</p>
+          <p>{this.timerStore.mainDisplay}</p>
             {firstButton}
             {secondButton}
          </div>

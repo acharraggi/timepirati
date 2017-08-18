@@ -41,7 +41,8 @@ export class TimerStore {
   @observable timer;
   @observable startTime;
 
-  constructor() {
+  constructor(rootStore) {
+    this.rootStore = rootStore;
     this.isRunning = false;
     this.timer = new Timer();
   }

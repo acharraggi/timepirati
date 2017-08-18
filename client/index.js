@@ -10,15 +10,15 @@ import {
   Route
 } from 'react-router-dom';
 import App from './components/App.jsx';
-import {TimerStore} from './TimerStore';
+import {RootStore} from './RootStore';
 import {useStrict} from 'mobx';
 useStrict(true);
 
-const timerStore = new TimerStore();
+const rootStore = new RootStore();
 
 ReactDOM.render(
   <BrowserRouter>
-    <Route path="/" render={routeProps => <App {...routeProps} timerStore={timerStore}/>}>
+    <Route path="/" render={routeProps => <App {...routeProps} rootStore={rootStore}/>}>
     </Route>
   </BrowserRouter>,
   document.getElementById('root')
