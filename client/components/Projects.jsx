@@ -1,4 +1,5 @@
 import React from 'react';
+import {NavLink} from 'react-router-dom';
 import {observer} from "mobx-react";
 import styles from './projects.css';
 
@@ -8,19 +9,13 @@ export default @observer class Projects extends React.Component {
     this.projectStore = props.rootStore.projectStore;
   }
 
-  deleteProject(p) {
-    if (window.confirm("Do you really want to delete "+p.name+"?")) {
-      console.log("yes, delete");
-      p.delete();
-    }
-  }
-
   render() {
     return (
         <div>
           <h2>Projects</h2>
           <p>This is the projects page.</p>
           <h2>Project List</h2>
+          <NavLink to="/newProject">+ New Project</NavLink>
           <table>
             <thead>
               <tr>
@@ -43,5 +38,5 @@ export default @observer class Projects extends React.Component {
     );
   };
 }
-//                  {/*<td><button onClick={() => this.delete(project.name)}>Delete</button></td>*/}
+
 

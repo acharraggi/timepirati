@@ -5,6 +5,7 @@ import React from 'react';
 import styles from './app.css';
 import Home from './Home.jsx';
 import Projects from './Projects.jsx';
+import NewProject from './NewProject.jsx';
 import Timer from './Timer.jsx';
 import About from './About.jsx';
 import {
@@ -29,6 +30,7 @@ export default class App extends React.Component {
           <div className={styles.content}>
             <Route exact path="/" component={Home}/>
             <Route path="/projects" render={routeProps => <Projects {...routeProps} rootStore={this.props.rootStore}/>}/>
+            <Route path="/newProject" render={routeProps => <NewProject {...routeProps} rootStore={this.props.rootStore}/>}/>
             <Route path="/timer" render={routeProps => <Timer {...routeProps} rootStore={this.props.rootStore}/>}/>
             <Route path="/about" render={routeProps => <About {...routeProps} rootStore={this.props.rootStore}/>}/>
           </div>

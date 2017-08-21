@@ -61,7 +61,7 @@ export class ProjectStore {
   /**
    * A Project was somehow deleted, clean it from the client memory
    */
-  removeProject(Project) {
+  @action removeProject(Project) {
     this.projectList.splice(this.projectList.indexOf(Project), 1);
     Project.dispose();
   }
@@ -138,7 +138,7 @@ console.log(id+": "+name);
   /**
    * Update this Project with information from the server
    */
-  updateFromJson(json) {
+  @action updateFromJson(json) {
     // make sure our changes aren't send back to the server
     this.autoSave = false;
     this.completed = json.completed;
@@ -148,7 +148,7 @@ console.log(id+": "+name);
 
   dispose() {
     // clean up the observer
-    this.saveHandler();
+    //this.saveHandler();
   }
 }
 
@@ -197,6 +197,6 @@ export class Task {
   //
   dispose() {
     // clean up the observer
-    this.saveHandler();
+    //this.saveHandler();
   }
 }
