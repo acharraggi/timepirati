@@ -22,8 +22,6 @@ export default @observer class NewProject extends React.Component {
   handleSubmit() {
     //console.log("handle submit was called with "+this.state.inputName+this.state.inputDescription);
     this.projectStore.projectList.push(new Project(this.projectStore,this.state.inputName,this.state.inputDescription));
-    // this.updateMsg = "Project " + this.state.inputName + " created.";
-    //this.setState({updateMsg: 'Project ' + this.state.inputName + ' created.'});
     this.setState({projectAdded: true});
    // this.setState({inputName: '', inputDescription: ''});
    // this.router.push('/projects')
@@ -63,7 +61,6 @@ export default @observer class NewProject extends React.Component {
                     </label>
                     <button type="button" onClick={this.handleSubmit} className="btn">Add Project</button>
                   </form>
-                  <p>{this.state.updateMsg}</p>
                 </div>
       )
     }

@@ -27,7 +27,7 @@ export default @observer class Projects extends React.Component {
             <tbody>
             {this.projectStore.projectList.map(project => (
                 <tr key={project.id}>
-                  <td>{project.name}</td>
+                  <td><NavLink to={`/editProject/${project.id}`}>{project.name}</NavLink></td>
                   <td>{project.description}</td>
                   <td><button onClick={() => project.delete()}>Delete</button></td>
                 </tr>

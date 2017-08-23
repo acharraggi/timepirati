@@ -113,6 +113,12 @@ console.log(id+": "+name);
   // @action addTask(task) {
   //   this.Tasks.push(task);
   // }
+  @action updateName(name) {
+    this.name = name;
+  }
+  @action updateDescription(description) {
+    this.description = description;
+  }
 
   /**
    * Remove this Project from the client and server
