@@ -24,11 +24,11 @@ export class ProjectStore {
     //let p = new Project(this,"SideProjects","Side projects");
     //p.addTask(new Task("TimePirati","a time tracking app"));
     //p.addTask(new Task("ReactNative","learn React Native"));
-    this.projectList.push(new Project(this,"SideProjects","Side projects"));
+    //this.projectList.push(new Project(this,"SideProjects","Side projects"));
     //p = new Project(this,"AWS","Amazon Web Services admin");
-    this.projectList.push(new Project(this,"AWS","Amazon Web Services admin"));
+    //this.projectList.push(new Project(this,"AWS","Amazon Web Services admin"));
     //p = new Project(this,"Personal");
-    this.projectList.push(new Project(this,"Personal"));
+    //this.projectList.push(new Project(this,"Personal"));
   }
 
   /**
@@ -52,10 +52,10 @@ export class ProjectStore {
   /**
    * Creates a fresh Project on the client and server
    */
-  createProject() {
-    var Project = new Project(this);
-    this.projectList.push(Project);
-    return Project;
+  @action createProject(name,desc='') {
+    const p = new Project(this,name,desc);
+    this.projectList.push(p);
+    return p;
   }
 
   /**
@@ -76,7 +76,7 @@ export class Project {
 
   @observable name = "";
   @observable description = "";
-  //@observable Tasks = [];
+  @observable taskList = [];
 
   store = null;
 
@@ -97,7 +97,8 @@ export class Project {
     this.id = id;
     this.name = name;
     this.description = description;
-console.log(id+": "+name);
+    this.taskList = [];
+//console.log(id+": "+name);
     // this.saveHandler = reaction(
     //     // observe everything that is used in the JSON:
     //     () => this.asJson,
@@ -110,9 +111,13 @@ console.log(id+": "+name);
     // );
   }
 
-  // @action addTask(task) {
-  //   this.Tasks.push(task);
-  // }
+  @action addTask(task) {
+    this.taskList.push(task);
+  }
+  @action removeTask(task) {
+    this.taskList.splice(this.taskList.indexOf(task), 1);
+  }
+
   @action updateName(name) {
     this.name = name;
   }
