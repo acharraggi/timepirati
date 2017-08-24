@@ -1,10 +1,9 @@
 import React from 'react';
-import {Project} from '../ProjectStore.js';
+import {Task} from '../ProjectStore.js';
 import {observer, action} from "mobx-react";
-import { Redirect } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 export default @observer class EditProject extends React.Component {
-
 
   constructor(props) {
     super(props);
@@ -17,44 +16,16 @@ export default @observer class EditProject extends React.Component {
       console.log("EditProject not able to find project in projectList ");
     }
     else {
-      console.log("EditProject found "+this.project.name);
-    }
-    this.state = {
-      inputName: this.project.name,
-      inputDescription: this.project.description,
-      projectUpdated: false,
-    };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.onBlur = this.onBlur.bind(this);
-    this.handleEnterKeyPress = this.handleEnterKeyPress.bind(this);
-    this.updateInputValue = this.updateInputValue.bind(this);
-  }
-
-  handleSubmit() {
-//    console.log('handle submit '+this.state.inputName+this.state.inputDescription);
-//    console.log(this.project.name);
-    this.setState({projectUpdated: true});
-    this.project.updateName(this.state.inputName);
-    this.project.updateDescription(this.state.inputDescription);
-  }
-
-  onBlur(event) {
-    //console.log("field "+event.target.name+": "+event.target.value);
-    switch(event.target.name) {
-      case 'name': this.setState({inputName: event.target.value});
-        break;
-      case 'description': this.setState({inputDescription: event.target.value});
-        break;
-      default: /*do nothing*/
+      //console.log("EditProject found "+this.project.name);
     }
   }
 
   updateInputValue(event) {
-    console.log("updateInputValue "+event.target.name+": "+event.target.value);
+    //console.log("updateInputValue "+event.target.name+": "+event.target.value);
     switch(event.target.name) {
-      case 'name': this.setState({inputName: event.target.value});
+      case 'name': this.project.updateName(event.target.value)
         break;
-      case 'description': this.setState({inputDescription: event.target.value});
+      case 'description': this.project.updateDescription(event.target.value)
         break;
       default: /*do nothing*/
     }
@@ -66,30 +37,64 @@ export default @observer class EditProject extends React.Component {
     return false;
   }
 
+  handleTaskNameChange = (idx) => (evt) => {
+    this.project.taskList[idx].updateName(evt.target.value);
+  }
+
+  handleTaskDescriptionChange = (idx) => (evt) => {
+    this.project.taskList[idx].updateDescription(evt.target.value);
+  }
+
+  handleAddTask= () => {
+    this.project.addTask(new Task(''));
+  }
+
   render () {
-    if (this.state.projectUpdated) {
-      return (<Redirect to="/projects"/>)
-    }
-    else {
       return (
           <div>
             <h2>Edit Project</h2>
             <form>
               <label>Name:
-                {/*<input name="name" type="text" value={this.state.inputName} onBlur={this.onBlur} onKeyPress={this.handleEnterKeyPress} />*/}
-                <input name="name" type="text" value={this.state.inputName} onChange={evt => this.updateInputValue(evt)}
-                       onKeyPress={this.handleEnterKeyPress}/>
+                <input autoFocus name="name" type="text" value={this.project.name}
+                       onChange={evt => this.updateInputValue(evt)}
+                       onKeyPress={this.handleEnterKeyPress}
+                />
               </label>
               <label>Description:
-                <input name="description" type="text" value={this.state.inputDescription}
-                       onChange={evt => this.updateInputValue(evt)} onKeyPress={this.handleEnterKeyPress}/>
+                <input name="description" type="text" value={this.project.description}
+                       onChange={evt => this.updateInputValue(evt)}
+                       onKeyPress={this.handleEnterKeyPress}
+                />
               </label>
-              <button type="button" onClick={this.handleSubmit} className="btn">Update Project</button>
             </form>
+            <h2>Tasks</h2>
+            <table>
+              <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Delete?</th>
+              </tr>
+              </thead>
+              <tbody>
+            {this.project.taskList.map((task, idx) => (
+              <tr key={task.id}>
+                <td><input type="text" placeholder={`task #${idx + 1} name`} value={task.name}
+                           onChange={this.handleTaskNameChange(idx)}
+                           autoFocus
+                /></td>
+                <td><input type="text" placeholder={`task #${idx + 1} description`} value={task.description}
+                           onChange={this.handleTaskDescriptionChange(idx)}
+                  /></td>
+                <td><button type="button" onClick={() => this.project.removeTask(task)}>Delete</button></td>
+              </tr>
+               ))}
+              </tbody>
+            </table>
+            <button type="button" onClick={this.handleAddTask} className="small">Add Task</button>
+            <p><NavLink to="/projects">Return to project list.</NavLink></p>
           </div>
       )
-    }
   }
 }
-
 

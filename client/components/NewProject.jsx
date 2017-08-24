@@ -54,7 +54,7 @@ export default @observer class NewProject extends React.Component {
                   <h2>New Project</h2>
                   <form>
                     <label>Name:
-                      <input name="name" type="text" onBlur={this.onBlur} onKeyPress={this.handleEnterKeyPress} />
+                      <input autoFocus name="name" type="text" onBlur={this.onBlur} onKeyPress={this.handleEnterKeyPress} />
                     </label>
                     <label>Description:
                       <input name="description" type="text" onBlur={this.onBlur} onKeyPress={this.handleEnterKeyPress} />

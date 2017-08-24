@@ -174,7 +174,7 @@ export class Task {
   @observable description = "";
 
 
-  constructor(name,description,id=v4()) {
+  constructor(name,description='',id=v4()) {
     this.id = id;
     this.name = name;
     this.description = description;
