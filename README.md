@@ -9,6 +9,9 @@ Status: timer works and continues even if laptop sleeps or hibernates.
 But doesn't survive a browser window refresh (since it's not saving state anywhere else yet)
 
 Converted to single page app with React Router Dom.
+Uses ES6 javascript with [Standard Style](https://standardjs.com/) formatting.
+
+Unit tests in Jest and Enzyme.
 
 TO DO:
 * save timer state in case browser closed.
