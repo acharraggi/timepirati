@@ -1,5 +1,5 @@
 import React from 'react'
-import {Project} from '../ProjectStore.js'
+// import {Project} from '../ProjectStore.js'
 import {observer} from 'mobx-react'
 import {Redirect} from 'react-router-dom'
 
@@ -20,7 +20,8 @@ import {Redirect} from 'react-router-dom'
 
   handleSubmit () {
     // console.log("handle submit was called with "+this.state.inputName+this.state.inputDescription);
-    this.projectStore.projectList.push(new Project(this.projectStore, this.state.inputName, this.state.inputDescription))
+    // this.projectStore.projectList.push(new Project(this.projectStore, this.state.inputName, this.state.inputDescription))
+    this.projectStore.createProject(this.state.inputName, this.state.inputDescription)
     this.setState({projectAdded: true})
   }
 

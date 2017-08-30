@@ -1,16 +1,46 @@
-import {observable, computed, action} from 'mobx'
+import {observable, computed, action, reaction} from 'mobx'
 import {v4} from 'uuid'
 import moment from 'moment'
 import format from 'format-number-with-string'
 
 export class Timer {
+  id = null;
   @observable milliseconds
   @observable savedMilliseconds
 
-  constructor (initialMilliseconds = 0) {
+  /**
+   * Indicates whether changes in this object
+   * should be submitted to the server
+   */
+  autoSave = true
+  /**
+   * Indicates whether changes in this object
+   * should be saved in localStorage
+   */
+  localSave = true
+  /**
+   * Disposer for the side effect that automatically
+   * stores this Timer, see @dispose.
+   */
+  saveHandler = null
+
+  constructor (initialMilliseconds = 0, id = v4()) {
     this.milliseconds = initialMilliseconds
     this.savedMilliseconds = 0
-    this.id = v4()
+    this.id = id
+    this.saveHandler = reaction(
+      // observe everything that is used in the JSON:
+      () => this.asJson,
+      // if autoSave is on, send json to server
+      (json) => {
+        if (this.autoSave) {
+          // this.store.transportLayer.saveTimer(json)
+        }
+        if (this.localSave) {
+          localStorage.timer = json
+        }
+      }
+    )
   }
 
   @action saveTime () {
@@ -33,6 +63,24 @@ export class Timer {
 
     return `${format(hours, '00')}:${format(minutes % 60, '00')}:${format(seconds % 60, '00')}`
   }
+
+  @computed get asJson () {
+    return JSON.stringify(this, ['id', 'milliseconds', 'savedMilliseconds'])
+  }
+
+  /**
+   * Update this Timer with information from the server
+   */
+  @action updateFromJson (json) {
+    this.milliseconds = json.milliseconds
+    this.savedMilliseconds = json.savedMilliseconds
+    this.saveTime()
+  }
+
+  dispose () {
+    // clean up the observer
+    this.saveHandler()
+  }
 }
 
 export class TimerStore {
@@ -43,7 +91,30 @@ export class TimerStore {
   constructor (rootStore) {
     this.rootStore = rootStore
     this.isRunning = false
-    this.timer = new Timer()
+    // this.timer = new Timer()
+    this.loadCounter()
+  }
+
+  loadCounter () {
+    if (typeof (Storage) !== 'undefined') {
+      // Code for localStorage/sessionStorage.
+      if (localStorage.timer) {
+        // restore stored timer
+        // console.log('localStorage found: '+localStorage.timer)
+        const savedValue = JSON.parse(localStorage.timer)
+        // console.log('savedValue=' + savedValue.id)
+
+        this.timer = new Timer(savedValue.id)
+        this.timer.updateFromJson(savedValue)
+      } else {
+        // no counter stored, create new
+        this.timer = new Timer()
+        // localStorage.counter = this.counter.asJson
+      }
+    } else {
+      // Sorry! No Web Storage support.. Just create counter
+      this.timer = new Timer()
+    }
   }
 
   @computed get mainDisplay () {
@@ -57,7 +128,7 @@ export class TimerStore {
   @action measure () {
     if (!this.isRunning) return
     this.timer.milliseconds = moment().diff(this.startTime)
-    setTimeout(() => this.measure(), 10)
+    setTimeout(() => this.measure(), 1000)   // measure every 1000ms
   }
 
   @action startTimer () {
