@@ -78,9 +78,10 @@ export class ProjectStore {
     console.log('restoring project.id = ' + json.id)
     let p = this.projectList.find(Proj => Proj.id === json.id)
     if (!p) {
-      p = new Project(this, json.id)
-      json.taskList.forEach(function (t) { let tsk = new Task(t.id); tsk.updateFromJson(t); p.addTask(tsk) })
+      p = new Project(this, '', '', json.id)  // project is restored, then updateFromJson will be called below
+      json.taskList.forEach(function (t) { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); p.addTask(tsk) })
       this.projectList.push(p)
+      console.log('project id restored:' + p.id)
     }
     if (json.isDeleted) {
       this.removeProject(p)
@@ -105,7 +106,7 @@ export class ProjectStore {
   /**
    * Creates a fresh Project on the client and server
    */
-  @action createProject (name, desc = '') {
+  @action createProject (name = '', desc = '') {
     const p = new Project(this, name, desc)
     this.projectList.push(p)
     return p
@@ -152,7 +153,7 @@ export class Project {
    */
   saveHandler = null
 
-  constructor (store, name, description = '', id = v4()) {
+  constructor (store, name = '', description = '', id = v4()) {
     this.store = store
     this.id = id
     this.name = name
@@ -238,7 +239,7 @@ export class Task {
   @observable name = ''
   @observable description = ''
 
-  constructor (name, description = '', id = v4()) {
+  constructor (name = '', description = '', id = v4()) {
     this.id = id
     this.name = name
     this.description = description

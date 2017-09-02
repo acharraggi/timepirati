@@ -7,6 +7,9 @@ export class Timer {
   id = null;
   @observable milliseconds
   @observable savedMilliseconds
+  @observable note
+  @observable projectID
+  @observable taskID
 
   /**
    * Indicates whether changes in this object
@@ -28,6 +31,9 @@ export class Timer {
     this.milliseconds = initialMilliseconds
     this.savedMilliseconds = 0
     this.id = id
+    this.note = ''
+    this.projectID = ''
+    this.taskID = ''
     this.saveHandler = reaction(
       // observe everything that is used in the JSON:
       () => this.asJson,
@@ -64,8 +70,32 @@ export class Timer {
     return `${format(hours, '00')}:${format(minutes % 60, '00')}:${format(seconds % 60, '00')}`
   }
 
+  @action setNote (n) {
+    this.note = n
+  }
+
+  @computed get getNote () {
+    return this.note
+  }
+
+  @action setProjectID (p) {
+    this.projectID = p
+  }
+
+  @computed get getProjectID () {
+    return this.projectID
+  }
+
+  @action setTaskID (t) {
+    this.taskID = t
+  }
+
+  @computed get getTaskID () {
+    return this.taskID
+  }
+
   @computed get asJson () {
-    return JSON.stringify(this, ['id', 'milliseconds', 'savedMilliseconds'])
+    return JSON.stringify(this, ['id', 'milliseconds', 'savedMilliseconds', 'note', 'projectID', 'taskID'])
   }
 
   /**
@@ -74,7 +104,10 @@ export class Timer {
   @action updateFromJson (json) {
     this.milliseconds = json.milliseconds
     this.savedMilliseconds = json.savedMilliseconds
-    this.saveTime()
+    this.note = json.note
+    this.projectID = json.projectID
+    this.taskID = json.taskID
+    this.saveTime()   // just in case timer was running when browser closed or page reloaded
   }
 
   dispose () {
@@ -91,19 +124,15 @@ export class TimerStore {
   constructor (rootStore) {
     this.rootStore = rootStore
     this.isRunning = false
-    // this.timer = new Timer()
-    this.loadCounter()
+    this.loadTimer()
   }
 
-  loadCounter () {
+  loadTimer () {
     if (typeof (Storage) !== 'undefined') {
       // Code for localStorage/sessionStorage.
       if (localStorage.timer) {
         // restore stored timer
-        // console.log('localStorage found: '+localStorage.timer)
         const savedValue = JSON.parse(localStorage.timer)
-        // console.log('savedValue=' + savedValue.id)
-
         this.timer = new Timer(savedValue.id)
         this.timer.updateFromJson(savedValue)
       } else {
@@ -134,7 +163,7 @@ export class TimerStore {
   @action startTimer () {
     if (this.isRunning) return
     this.isRunning = true
-    this.startTime = moment()
+    this.startTime = moment()   // current date/time
     this.measure()
   }
 

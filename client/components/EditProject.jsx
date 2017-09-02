@@ -44,7 +44,7 @@ import { NavLink } from 'react-router-dom'
   }
 
   handleAddTask= () => {
-    this.project.addTask(new Task(''))
+    this.project.addTask(new Task())
   }
 
   render () {
