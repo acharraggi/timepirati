@@ -2,7 +2,7 @@ TimePirati
 ===
 This is a little side project to build a time tracker.
 
-The frontend is now live at [TimePirati](http://timepirati.mikesilversides.com.s3-website-us-east-1.amazonaws.com/) hosted at Amazon S3.
+The frontend is now live at [TimePirati](https://d3lt7u0bimdora.cloudfront.net/) hosted at Amazon S3 with a CloudFront distribution.
 
 The backend will be Amazon AWS serverless services like Lambda and DynamoDB.
 The client will make use of CSS Modules with React and webpack.
