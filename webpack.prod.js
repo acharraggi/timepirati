@@ -8,14 +8,18 @@ module.exports = merge(common, {
     new S3Plugin({
       include: /.*\.(css|js|html)/,
       s3Options: {
-        //   accessKeyId: 'key-need to change this to use ENV or a credentials file',
+        //   accessKeyId: 'stored in .aws/credentials',
         //   secretAccessKey: 'secret'
       },
       s3UploadOptions: {
         Bucket: 'timepirati.mikesilversides.com'
-      }
+      },
       // optionally, upload to a sub-folder
       // basePath: '/'
+      cloudfrontInvalidateOptions: {
+        DistributionId: 'E1CW0GNIEYRCWH',
+        Items: ['/*']
+      }
     })
   ]
 })
