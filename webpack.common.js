@@ -24,6 +24,14 @@ module.exports = {
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract('css-loader?modules=true&localIdentName=[name]__[local]___[hash:base64:5]')
+      },
+      {
+        test: /\.(png|ico|xml|svg|json)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: ''
+        }
       }
     ]
   },

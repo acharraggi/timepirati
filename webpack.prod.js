@@ -6,7 +6,7 @@ module.exports = merge(common, {
   plugins: [
     // new UglifyJSPlugin()
     new S3Plugin({
-      include: /.*\.(css|js|html)/,
+      include: /.*\.(css|js|html|png|ico|svg|json|xml)/,
       s3Options: {
         //   accessKeyId: 'stored in .aws/credentials',
         //   secretAccessKey: 'secret'
