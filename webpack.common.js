@@ -21,12 +21,14 @@ module.exports = {
       { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
       { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ },
       /**     { test: /\.css$/, loader: "style-loader!css-loader"} **/
-      {
-        test: /\.css$/,
+      { test: /\.css$/,
         loader: ExtractTextPlugin.extract('css-loader?modules=true&localIdentName=[name]__[local]___[hash:base64:5]')
       },
-      {
-        test: /\.(png|ico|xml|svg|json)$/,
+      { test: /\.json$/,   // for AWS Cognito - exclude json in favicon loader
+        exclude: /favicons/,
+        loader: 'json-loader'},
+      { test: /\.(png|ico|xml|svg|json)$/,  // for favicons.
+        include: /favicons/,
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',

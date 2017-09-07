@@ -9,6 +9,7 @@ import NewProject from './NewProject.jsx'
 import EditProject from './EditProject.jsx'
 import Timer from './Timer.jsx'
 import About from './About.jsx'
+import SignUp from './SignUp.jsx'
 import {
   NavLink,
   Route
@@ -27,6 +28,7 @@ export default class App extends React.Component {
           <li className={styles.ul_li}><NavLink to='/projects' exact activeClassName={styles.selected}>Projects</NavLink></li>
           <li className={styles.ul_li}><NavLink to='/timer' exact activeClassName={styles.selected}>Timer</NavLink></li>
           <li className={styles.ul_li}><NavLink to='/about' exact activeClassName={styles.selected}>About</NavLink></li>
+          <li className={styles.ul_li}><NavLink to='/signup' exact activeClassName={styles.selected}>Sign Up</NavLink></li>
         </ul>
         <div className={styles.content}>
           <Route exact path='/' component={Home} />
@@ -35,6 +37,7 @@ export default class App extends React.Component {
           <Route path='/editProject/:id' render={routeProps => <EditProject {...routeProps} rootStore={this.props.rootStore} />} />
           <Route path='/timer' render={routeProps => <Timer {...routeProps} rootStore={this.props.rootStore} />} />
           <Route path='/about' render={routeProps => <About {...routeProps} rootStore={this.props.rootStore} />} />
+          <Route path='/signup' render={routeProps => <SignUp {...routeProps} rootStore={this.props.rootStore} />} />
         </div>
       </div>
     )
