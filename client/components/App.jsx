@@ -23,9 +23,6 @@ import {observer} from 'mobx-react'
     super(props)
     this.userStore = props.rootStore.userStore
   }
-  handleLogout = event => {
-    this.userStore.userHasAuthenticated(false)
-  }
   render () {
     let signUpIn = (this.userStore.userName !== '' && this.userStore.rememberUser
       ? <li className={styles.ul_li}><NavLink to='/signin' exact activeClassName={styles.selected}>Sign In</NavLink></li>
@@ -35,7 +32,7 @@ import {observer} from 'mobx-react'
         </span>
     )
     let signLinks = (this.userStore.isAuthenticated
-      ? <li className={styles.ul_li}><NavLink to='/signout' exact onClick={this.handleLogout} activeClassName={styles.selected}>Sign Out</NavLink></li>
+      ? <li className={styles.ul_li}><NavLink to='/signout' exact activeClassName={styles.selected}>Sign Out</NavLink></li>
       : signUpIn
       )
     return (

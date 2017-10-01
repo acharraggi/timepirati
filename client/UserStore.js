@@ -6,6 +6,7 @@ export class User {
   @observable myUserName
   @observable myIsAuthenticated
   @observable myRememberMe
+  @observable myToken
 
   /**
    * Indicates whether changes in this object
@@ -27,6 +28,7 @@ export class User {
     this.id = id
     this.myUserName = userName
     this.myIsAuthenticated = false
+    this.myToken = ''
     this.myRememberMe = false
     console.log('new user with id = ' + id)
     this.saveHandler = reaction(
@@ -50,11 +52,19 @@ export class User {
   @action setRememberUser (b) {
     this.myRememberMe = b
   }
-  @action userHasAuthenticated (authenticated) {
+  @action userHasAuthenticated (authenticated, token) {
     this.myIsAuthenticated = authenticated
+    if (authenticated) {
+      this.myToken = token
+    } else {
+      this.myToken = ''
+    }
   }
   @computed get userName () {
     return this.myUserName
+  }
+  get userId () {
+    return this.id
   }
   @computed get isAuthenticated () {
     return this.myIsAuthenticated
@@ -62,9 +72,11 @@ export class User {
   @computed get rememberUser () {
     return this.myRememberMe
   }
-
+  @computed get getIdToken () {
+    return this.myToken
+  }
   @computed get asJson () {
-    return JSON.stringify(this, ['id', 'myUserName', 'myIsAuthenticated', 'myRememberMe'])
+    return JSON.stringify(this, ['id', 'myUserName', 'myIsAuthenticated', 'myRememberMe', 'myToken'])
   }
 
   /**
@@ -74,6 +86,7 @@ export class User {
     this.myUserName = json.myUserName
     this.myIsAuthenticated = json.myIsAuthenticated
     this.myRememberMe = json.myRememberMe
+    this.myToken = json.myToken
   }
 
   dispose () {
@@ -95,7 +108,7 @@ export class UserStore {
       // Code for localStorage/sessionStorage.
       if (localStorage.user) {
         const savedValue = JSON.parse(localStorage.user)
-        this.myUser = new User()
+        this.myUser = new User('', savedValue.id)
         this.myUser.updateFromJson(savedValue)
       } else {
         // no user stored, create new
@@ -110,8 +123,8 @@ export class UserStore {
   @action setUser (userName) {
     this.myUser.setUser(userName)
   }
-  @action userHasAuthenticated (authenticated) {
-    this.myUser.userHasAuthenticated(authenticated)
+  @action userHasAuthenticated (authenticated, token = '') {
+    this.myUser.userHasAuthenticated(authenticated, token)
   }
   @action setRememberUser (b) {
     this.myUser.setRememberUser(b)
@@ -119,10 +132,16 @@ export class UserStore {
   @computed get userName () {
     return this.myUser.userName
   }
+  get userId () {
+    return this.myUser.userId
+  }
   @computed get isAuthenticated () {
     return this.myUser.isAuthenticated
   }
   @computed get rememberUser () {
     return this.myUser.rememberUser
+  }
+  @computed get getIdToken () {
+    return this.myUser.getIdToken
   }
 }

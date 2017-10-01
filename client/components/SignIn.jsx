@@ -1,4 +1,3 @@
-import {Config, CognitoIdentityCredentials} from 'aws-sdk'
 import {
   CognitoUserPool,
   AuthenticationDetails,
@@ -7,11 +6,9 @@ import {
 import appConfig from './awsconfig'
 import React from 'react'
 import {observer} from 'mobx-react'
-
-Config.region = appConfig.region
-Config.credentials = new CognitoIdentityCredentials({
-  IdentityPoolId: appConfig.IdentityPoolId
-})
+import AWS from 'aws-sdk'
+import { util } from 'aws-sdk/global'
+AWS.config.region = appConfig.region
 
 const userPool = new CognitoUserPool({
   UserPoolId: appConfig.UserPoolId,
@@ -26,11 +23,11 @@ let userData = {
   constructor (props) {
     super(props)
     this.userStore = props.rootStore.userStore
+    this.projectStore = props.rootStore.projectStore
     let emailid
     if (this.userStore.rememberUser) {
       emailid = this.userStore.userName
-    }
-    else {
+    } else {
       emailid = ''
     }
     this.state = {
@@ -39,6 +36,7 @@ let userData = {
       errorMsg: '',
       rememberMe: this.userStore.rememberUser
     }
+    this.insertUser = this.insertUser.bind(this)  // tempUser
   }
 
   handleEmailChange (e) {
@@ -66,10 +64,14 @@ let userData = {
     this.userStore.setRememberUser(this.state.rememberMe)
     let cognitoUser = new CognitoUser(userData)
     cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
-        console.log('access token + ' + result.getAccessToken().getJwtToken())
-        this.userStore.userHasAuthenticated(true)
+      onSuccess: (result) => { // result is idToken, refreshToken, accessToken
+        console.log('sign in success, getIdToken = ' + result.idToken.jwtToken)
+        const payload = result.idToken.jwtToken.split('.')[1]
+        const resultJson = JSON.parse(util.base64.decode(payload).toString('utf8'))
+        console.log('IdToken + ' + JSON.stringify(resultJson, null, 4))
+        this.userStore.userHasAuthenticated(true, result.idToken.jwtToken)
         this.setState({errorMsg: 'Sign in successful!'})
+        this.insertUser()  // tempUser
       },
       onFailure: (err) => {
         this.userStore.userHasAuthenticated(false)
@@ -77,7 +79,38 @@ let userData = {
       }
     })
   }
-
+  insertUser () { // tempUser
+    const params = {
+      TableName: 'TimePiratiUsers',
+      // 'Item' contains the attributes of the item to be created
+      // - 'userid': my userid
+      // - 'projects': projectStore
+      // - 'note': time log note
+      // - 'createdAt': current Unix timestamp
+      // note: these fields must be non-empty.
+      Item: {
+        userid: this.userStore.userId,
+        username: this.userStore.userName,
+        note: 'test 2',
+        projects: this.projectStore.asJson,
+        createdAt: new Date().getTime()
+      }
+    }
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: appConfig.IdentityPoolId,
+      Logins: {
+        'cognito-idp.us-east-1.amazonaws.com/us-east-1_cYDmjMIFp': this.userStore.getIdToken
+      }
+    })
+    const dynamoDb = new AWS.DynamoDB.DocumentClient()
+    dynamoDb.put(params, (error, data) => {
+      if (error) {
+        console.log(error)
+      } else {
+        console.log('user inserted')
+      }
+    })
+  }
   render () {
     return (
       <div>
