@@ -98,12 +98,12 @@ export class User {
 export class UserStore {
   @observable myUser
 
-  constructor (rootStore) {
+  constructor (rootStore, transportLayer) {
     this.rootStore = rootStore
-    this.loadCounter()
+    this.loadUser()
   }
 
-  loadCounter () {
+  loadUser () {
     if (typeof (Storage) !== 'undefined') {
       // Code for localStorage/sessionStorage.
       if (localStorage.user) {

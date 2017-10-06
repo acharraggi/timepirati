@@ -5,7 +5,7 @@ import {
   CognitoUserPool,
   CognitoUser
 } from 'amazon-cognito-identity-js'
-import appConfig from './awsconfig.js'
+import appConfig from '../awsconfig.js'
 
 @observer export default class SignUp extends React.Component {
   constructor (props) {

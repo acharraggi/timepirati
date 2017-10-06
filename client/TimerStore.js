@@ -121,7 +121,7 @@ export class TimerStore {
   @observable timer
   @observable startTime
 
-  constructor (rootStore) {
+  constructor (rootStore, transportLayer) {
     this.rootStore = rootStore
     this.isRunning = false
     this.loadTimer()

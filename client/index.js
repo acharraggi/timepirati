@@ -21,9 +21,11 @@ import {
 import App from './components/App.jsx'
 import {RootStore} from './RootStore'
 import {useStrict} from 'mobx'
+import { TransportLayer } from './TransportLayer'
 useStrict(true)
 
-const rootStore = new RootStore()
+const transportLayer = new TransportLayer()
+const rootStore = new RootStore(transportLayer)
 
 ReactDOM.render(
   <BrowserRouter>

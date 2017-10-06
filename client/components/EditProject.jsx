@@ -1,5 +1,5 @@
 import React from 'react'
-import {Task} from '../ProjectStore.js'
+import {Project, Task} from '../ProjectStore.js'
 import {observer} from 'mobx-react'
 import { NavLink } from 'react-router-dom'
 

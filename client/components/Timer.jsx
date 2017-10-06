@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './Timer.css'
 import {observer} from 'mobx-react'
 import AWS from 'aws-sdk'
-import appConfig from './awsconfig'
+import appConfig from '../awsconfig'
 AWS.config.region = appConfig.region
 
 @observer export default class Timer extends React.Component {

@@ -2,14 +2,15 @@ import {observable, computed, action, reaction} from 'mobx'
 import {v4} from 'uuid'
 
 export class ProjectStore {
-  // transportLayer;
+  rootStore = null
+  transportLayer = null
   @observable projectList = []
-  // @observable isLoading = true
+  @observable isLoading = true
   /**
    * Indicates whether changes in this object
    * should be submitted to the server
    */
-  autoSave = false
+  autoSave = true
   /**
    * Indicates whether changes in this object
    * should be saved in local storage
@@ -21,8 +22,9 @@ export class ProjectStore {
    */
   saveHandler = null
 
-  constructor (/* transportLayer */) {
-    // this.transportLayer = transportLayer; // Thing that can make server requests for us
+  constructor (rootStore, transportLayer) {
+    this.rootStore = rootStore
+    this.transportLayer = transportLayer // Thing that can make server requests for us
     // this.transportLayer.onReceiveProjectUpdate(updatedProject => this.updateProjectFromServer(updatedProject));
     if (typeof (Storage) === 'undefined') {
       this.localSave = false
@@ -34,7 +36,8 @@ export class ProjectStore {
       // if autoSave is on, send json to server
       (json) => {
         if (this.autoSave) {
-          this.store.transportLayer.saveProject(json)
+          // this.transportLayer.saveProject(json)
+          this.transportLayer.insertUser(this.rootStore)
         }
         if (this.localSave) {
           localStorage.projectList = json
@@ -59,8 +62,10 @@ export class ProjectStore {
         console.log('localStorage found for projectList')
         const savedValue = JSON.parse(localStorage.projectList)
         console.log('number of projects: ' + savedValue.projectList.length)
+        this.isLoading = true
         // this.updateProjectFromServer(savedValue.projectList[0])
         savedValue.projectList.forEach(function (p) { this.updateProjectFromServer(p) }, this)
+        this.isLoading = false
       } else {
         // no projectList stored, just use empty projectList
       }
@@ -79,14 +84,14 @@ export class ProjectStore {
     let p = this.projectList.find(Proj => Proj.id === json.id)
     if (!p) {
       p = new Project(this, '', '', json.id)  // project is restored, then updateFromJson will be called below
-      json.taskList.forEach(function (t) { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); p.addTask(tsk) })
+      // json.taskList.forEach(function (t) { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); p.addTask(tsk) })
       this.projectList.push(p)
-      console.log('project id restored:' + p.id)
     }
     if (json.isDeleted) {
       this.removeProject(p)
     } else {
       p.updateFromJson(json)
+      console.log('project id restored:' + p.id)
     }
   }
 
@@ -94,7 +99,8 @@ export class ProjectStore {
     // alert(nm); obj
     let o = {}
     for (let prop in this) {
-      if (prop === 'autoSave' || prop === 'localSave' || prop === 'saveHandler') {
+      if (prop === 'autoSave' || prop === 'localSave' || prop === 'saveHandler' || prop === 'rootStore' ||
+        prop === 'transportLayer' || prop === 'isLoading') {
         continue // don't send to stringify
       } else { // to pass value unchanged
         o[prop] = this[prop]
@@ -114,6 +120,7 @@ export class ProjectStore {
 
   @computed get asJson () {
     return JSON.stringify(this)
+    // return JSON.stringify(this, ['id', 'myUserName', 'myIsAuthenticated', 'myRememberMe', 'myToken'])
   }
 
   /**
@@ -222,6 +229,8 @@ export class Project {
     this.autoSave = false
     this.name = json.name
     this.description = json.description
+    let proj = this
+    json.taskList.forEach(function (t) { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); proj.addTask(tsk) })
     this.autoSave = true
   }
 

@@ -3,7 +3,7 @@ import {
   CognitoUserPool,
   CognitoUserAttribute
 } from 'amazon-cognito-identity-js'
-import appConfig from './awsconfig'
+import appConfig from '../awsconfig'
 import React from 'react'
 import {observer} from 'mobx-react'
 
