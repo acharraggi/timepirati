@@ -22,7 +22,9 @@ export class ProjectStore {
    */
   saveHandler = null
 
-  constructor (rootStore, transportLayer) {
+  constructor (rootStore, transportLayer, autoSave = true, localSave = true) {
+    this.autoSave = autoSave
+    this.localSave = localSave
     this.rootStore = rootStore
     this.transportLayer = transportLayer // Thing that can make server requests for us
     // this.transportLayer.onReceiveProjectUpdate(updatedProject => this.updateProjectFromServer(updatedProject));
@@ -84,7 +86,7 @@ export class ProjectStore {
     let p = this.projectList.find(Proj => Proj.id === json.id)
     if (!p) {
       p = new Project(this, '', '', json.id)  // project is restored, then updateFromJson will be called below
-      // json.taskList.forEach(function (t) { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); p.addTask(tsk) })
+      p.updateFromJson(json)
       this.projectList.push(p)
     }
     if (json.isDeleted) {
@@ -126,9 +128,13 @@ export class ProjectStore {
   /**
    * A Project was somehow deleted, clean it from the client memory
    */
-  @action removeProject (Project) {
-    this.projectList.splice(this.projectList.indexOf(Project), 1)
-    Project.dispose()
+  @action removeProject (project) {
+    this.projectList.splice(this.projectList.indexOf(project), 1)
+    project.dispose()
+  }
+
+  @action updateProject (project, newProject) {
+    this.projectList.splice(this.projectList.indexOf(project), 1, newProject)
   }
 }
 
@@ -138,9 +144,10 @@ export class Project {
    */
   id = null
 
-  @observable name = ''
-  @observable description = ''
-  @observable taskList = []
+  @observable pName = ''
+  @observable pDescription = ''
+  @observable pLastUpdate = 0
+  @observable pTaskList = []
 
   store = null
 
@@ -148,24 +155,25 @@ export class Project {
    * Indicates whether changes in this object
    * should be submitted to the server
    */
-  autoSave = false
+  // autoSave = false
   /**
    * Indicates whether changes in this object
    * should be saved in localStorage
    */
-  localSave = true
+  // localSave = true
   /**
    * Disposer for the side effect that automatically
    * stores this Project, see @dispose.
    */
-  saveHandler = null
+  // saveHandler = null
 
-  constructor (store, name = '', description = '', id = v4()) {
+  constructor (store, name = '', description = '', id = v4(), createdTime = Date.now()) {
     this.store = store
     this.id = id
-    this.name = name
-    this.description = description
-    this.taskList = []
+    this.pName = name
+    this.pDescription = description
+    this.pLastUpdate = createdTime
+    this.pTaskList = []
 
     // this.saveHandler = reaction(
     //     // observe everything that is used in the JSON:
@@ -182,20 +190,45 @@ export class Project {
     // )
   }
 
-  @action addTask (task) {
-    this.taskList.push(task)
+  @computed get name () {
+    return this.pName
   }
-  @action removeTask (task) {
-    this.taskList.splice(this.taskList.indexOf(task), 1)
-  }
-
   @action updateName (name) {
-    this.name = name
+    this.pName = name
+    this.pLastUpdate = Date.now()
+  }
+  @computed get description () {
+    return this.pDescription
   }
   @action updateDescription (description) {
-    this.description = description
+    this.pDescription = description
+    this.pLastUpdate = Date.now()
   }
-
+  @computed get lastUpdate () {
+    return this.pLastUpdate
+  }
+  @action taskUpdated (updateTime) {
+    this.pLastUpdate = updateTime
+  }
+  @computed get taskList () {
+    return this.pTaskList
+  }
+  @action addTask (task) {
+    this.pTaskList.push(task)
+    this.pLastUpdate = Date.now()
+  }
+  @action removeTask (task) {
+    this.pTaskList.splice(this.pTaskList.indexOf(task), 1)
+    this.pLastUpdate = Date.now()
+  }
+  @action updateTaskName (idx, name) {
+    this.pTaskList[idx].updateName(name)
+    this.pLastUpdate = Date.now()
+  }
+  @action updateTaskDescription (idx, desc) {
+    this.pTaskList[idx].updateDescription(desc)
+    this.pLastUpdate = Date.now()
+  }
   /**
    * Remove this Project from the client and server
    */
@@ -205,7 +238,7 @@ export class Project {
   }
 
   @computed get asJson () {
-    return JSON.stringify(this, ['id', 'name', 'description', 'taskList'])
+    return JSON.stringify(this, ['id', 'pName', 'pDescription', 'pLastUpdate', 'pTaskList', 'tName', 'tDescription'])
   }
 
   toJSON (nm) { // arg: object name
@@ -226,12 +259,15 @@ export class Project {
    */
   @action updateFromJson (json) {
     // make sure our changes aren't send back to the server
-    this.autoSave = false
-    this.name = json.name
-    this.description = json.description
-    let proj = this
-    json.taskList.forEach(function (t) { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); proj.addTask(tsk) })
-    this.autoSave = true
+    // this.autoSave = false
+    this.pName = json.pName
+    this.pDescription = json.pDescription
+    this.pLastUpdate = json.pLastUpdate
+    if (json.pTaskList.length > 0) {
+      // let proj = this
+      json.pTaskList.forEach((t) => { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); this.addTask(tsk) })
+    }
+    // this.autoSave = true
   }
 
   dispose () {
@@ -245,30 +281,40 @@ export class Task {
    * unique id of this Task, immutable.
    */
   id = null
-  @observable name = ''
-  @observable description = ''
+  @observable tName
+  @observable tDescription
+  // @observable tLastUpdate = 0
 
   constructor (name = '', description = '', id = v4()) {
     this.id = id
-    this.name = name
-    this.description = description
+    this.tName = name
+    this.tDescription = description
+    // this.tLastUpdate = Date.now()
   }
 
   @action updateName (name) {
-    this.name = name
+    this.tName = name
+    // this.tLastUpdate = Date.now()
+    // this.project.taskUpdated(this.tLastUpdate)
+  }
+  @computed get name () {
+    return this.tName
   }
   @action updateDescription (description) {
-    this.description = description
+    this.tDescription = description
+    // this.tLastUpdate = Date.now()
+    // this.project.taskUpdated(this.tLastUpdate)
   }
-
-  // using JSON.stringify at the project level
-  // @computed get asJson () {
-  //   return {
-  //     id: this.id,
-  //     name: this.name,
-  //     description: this.description
-  //   }
+  @computed get description () {
+    return this.tDescription
+  }
+  // @computed get lastUpdate () {
+  //   return this.tLastUpdate
   // }
+
+  @computed get asJson () {
+    return JSON.stringify(this, ['id', 'tName', 'tDescription'])
+  }
 
   /**
    * Update this task with information from the server or local storage
@@ -276,8 +322,8 @@ export class Task {
   updateFromJson (json) {
     // make sure our changes aren't send back to the server
     // this.autoSave = false
-    this.name = json.name
-    this.description = json.description
+    this.tName = json.tName
+    this.tDescription = json.tDescription
     // this.autoSave = true
   }
 
