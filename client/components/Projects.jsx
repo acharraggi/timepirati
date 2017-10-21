@@ -21,7 +21,7 @@ import styles from './projects.css'
             <tr>
               <th>Name</th>
               <th>Description</th>
-              <th>Delete?</th>
+              <th>Archived?</th>
             </tr>
           </thead>
           <tbody>
@@ -29,7 +29,7 @@ import styles from './projects.css'
               <tr key={project.id}>
                 <td><NavLink to={`/editProject/${project.id}`}>{project.name}</NavLink></td>
                 <td>{project.description}</td>
-                <td><button onClick={() => project.delete()}>Delete</button></td>
+                <td><input name='archived' type='checkbox' defaultChecked={project.isArchived} onClick={(evt) => project.archive(evt.target.checked)} /></td>
               </tr>
             ))}
           </tbody>

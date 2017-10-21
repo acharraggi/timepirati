@@ -147,6 +147,7 @@ export class Project {
   @observable pName = ''
   @observable pDescription = ''
   @observable pLastUpdate = 0
+  @observable pArchived = false
   @observable pTaskList = []
 
   store = null
@@ -173,21 +174,8 @@ export class Project {
     this.pName = name
     this.pDescription = description
     this.pLastUpdate = createdTime
+    this.pArchived = false
     this.pTaskList = []
-
-    // this.saveHandler = reaction(
-    //     // observe everything that is used in the JSON:
-    //     () => this.asJson,
-    //     // if autoSave is on, send json to server
-    //     (json) => {
-    //       if (this.autoSave) {
-    //         this.store.transportLayer.saveProject(json);
-    //       }
-    //       if (this.localSave) {
-    //         localStorage.project = json
-    //       }
-    //     }
-    // )
   }
 
   @computed get name () {
@@ -204,21 +192,24 @@ export class Project {
     this.pDescription = description
     this.pLastUpdate = Date.now()
   }
+  @action archive (value = true) {
+    this.pArchived = value
+    this.pLastUpdate = Date.now()
+  }
+  @computed get isArchived () {
+    return this.pArchived
+  }
   @computed get lastUpdate () {
     return this.pLastUpdate
   }
-  @action taskUpdated (updateTime) {
-    this.pLastUpdate = updateTime
-  }
+  // @action taskUpdated (updateTime) {
+  //   this.pLastUpdate = updateTime
+  // }
   @computed get taskList () {
     return this.pTaskList
   }
   @action addTask (task) {
     this.pTaskList.push(task)
-    this.pLastUpdate = Date.now()
-  }
-  @action removeTask (task) {
-    this.pTaskList.splice(this.pTaskList.indexOf(task), 1)
     this.pLastUpdate = Date.now()
   }
   @action updateTaskName (idx, name) {
@@ -227,6 +218,10 @@ export class Project {
   }
   @action updateTaskDescription (idx, desc) {
     this.pTaskList[idx].updateDescription(desc)
+    this.pLastUpdate = Date.now()
+  }
+  @action archiveTask (idx, value) {
+    this.pTaskList[idx].archive(value)
     this.pLastUpdate = Date.now()
   }
   /**
@@ -238,7 +233,7 @@ export class Project {
   }
 
   @computed get asJson () {
-    return JSON.stringify(this, ['id', 'pName', 'pDescription', 'pLastUpdate', 'pTaskList', 'tName', 'tDescription'])
+    return JSON.stringify(this, ['id', 'pName', 'pDescription', 'pLastUpdate', 'pArchived', 'pTaskList', 'tName', 'tDescription', 'tArchived'])
   }
 
   toJSON (nm) { // arg: object name
@@ -258,21 +253,13 @@ export class Project {
    * Update this Project with information from the server
    */
   @action updateFromJson (json) {
-    // make sure our changes aren't send back to the server
-    // this.autoSave = false
     this.pName = json.pName
     this.pDescription = json.pDescription
     this.pLastUpdate = json.pLastUpdate
+    this.pArchived = json.pArchived
     if (json.pTaskList.length > 0) {
-      // let proj = this
       json.pTaskList.forEach((t) => { let tsk = new Task('', '', t.id); tsk.updateFromJson(t); this.addTask(tsk) })
     }
-    // this.autoSave = true
-  }
-
-  dispose () {
-    // clean up the observer
-    // this.saveHandler()
   }
 }
 
@@ -283,34 +270,35 @@ export class Task {
   id = null
   @observable tName
   @observable tDescription
-  // @observable tLastUpdate = 0
+  @observable tArchived
 
   constructor (name = '', description = '', id = v4()) {
     this.id = id
     this.tName = name
     this.tDescription = description
-    // this.tLastUpdate = Date.now()
+    this.tArchived = false
   }
 
   @action updateName (name) {
     this.tName = name
-    // this.tLastUpdate = Date.now()
-    // this.project.taskUpdated(this.tLastUpdate)
   }
   @computed get name () {
     return this.tName
   }
+
   @action updateDescription (description) {
     this.tDescription = description
-    // this.tLastUpdate = Date.now()
-    // this.project.taskUpdated(this.tLastUpdate)
   }
   @computed get description () {
     return this.tDescription
   }
-  // @computed get lastUpdate () {
-  //   return this.tLastUpdate
-  // }
+
+  @action archive (value = true) {
+    this.tArchived = value
+  }
+  @computed get isArchived () {
+    return this.tArchived
+  }
 
   @computed get asJson () {
     return JSON.stringify(this, ['id', 'tName', 'tDescription'])
@@ -320,15 +308,8 @@ export class Task {
    * Update this task with information from the server or local storage
    */
   updateFromJson (json) {
-    // make sure our changes aren't send back to the server
-    // this.autoSave = false
     this.tName = json.tName
     this.tDescription = json.tDescription
-    // this.autoSave = true
+    this.tArchived = json.tArchived
   }
-
-  // dispose () {
-  //   // clean up the observer
-  //   this.saveHandler()
-  // }
 }
