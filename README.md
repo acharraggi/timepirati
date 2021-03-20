@@ -17,4 +17,4 @@ Status
 The timer works and continues even if laptop sleeps or hibernates.
 Stores timer, project/task, user info to localStorage so it survives page refreshes/reloads.
 User Sign Up, Sign In and Sign Out pages added and linked to Cognito for authentication.
-
+---
